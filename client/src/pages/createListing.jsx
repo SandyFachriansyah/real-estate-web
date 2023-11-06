@@ -6,7 +6,7 @@ import {
   uploadBytesResumable,
 } from 'firebase/storage';
 import { app } from '../firebase';
-import { set } from 'mongoose';
+
 
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user)
-  const navigate = useNavigate
+  const navigate = useNavigate()
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -34,7 +34,6 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false)
-  console.log(formData);
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
@@ -119,31 +118,33 @@ export default function CreateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (formData.imageUrls.length < 1) return setError('you must upload at least one image')
-      if (formData.regularPrice < formData.discountPrice) return setError('discount price must lower from reguler price dude')
-      setLoading(true)
-      setError(false)
+      if (formData.imageUrls.length < 1)
+        return setError('You must upload at least one image');
+      if (+formData.regularPrice < +formData.discountPrice)
+        return setError('Discount price must be lower than regular price');
+      setLoading(true);
+      setError(false);
       const res = await fetch('/api/listing/create', {
         method: 'POST',
         headers: {
-          'Content-type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
-        })
-      })
-      const data = await res.json()
-      setLoading(false)
+        }),
+      });
+      const data = await res.json();
+      setLoading(false);
       if (data.success === false) {
-        setError(data.message)
+        setError(data.message);
       }
-      navigate(`/listing/${data._id}`)
+      navigate(`/listing/${data._id}`);
     } catch (error) {
-      setError(error.message)
-      setLoading(false)
+      setError(error.message);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <main className='p-3 max-w-4xl mx-auto'>
@@ -251,7 +252,7 @@ export default function CreateListing() {
           </div>
         </div>
         <div className='flex flex-col flex-1 gap-4'>
-          <p classN--ame='font-semibold'>
+          <p className='font-semibold'>
             Images:
             <span className='font-normal text-gray-600 ml-2'>
               The first image will be the cover (max 6) </span>
@@ -277,7 +278,8 @@ export default function CreateListing() {
           <p className='text-red-700 text-sm'>
             {imageUploadError && imageUploadError}
           </p>
-          {formData.imageUrls.length > 0 && formData.imageUrls.map((url, index) => (
+          {
+          formData.imageUrls.length > 0 && formData.imageUrls.map((url, index) => (
             <div
               key={url}
               className='flex justify-between p-3 border items-center'>
